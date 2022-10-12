@@ -114,7 +114,7 @@ const CreateGame = () => {
             className={styles.select}
           />
           {errors.name && !input.name ? (
-            <span>Name is required and must be whitout especial characters</span>
+            <span className={styles.spa}>Name is required and must be whitout especial characters</span>
           ) : (
             <span></span>
           )}
@@ -128,7 +128,7 @@ const CreateGame = () => {
             className={styles.select}
           />
           {errors.image && !input.image ? (
-            <span>Image is required and must be a valid url </span>
+            <span className={styles.spa}>Image is required and must be a valid url </span>
           ) : (
             <span></span>
           )}
@@ -142,7 +142,7 @@ const CreateGame = () => {
             className={styles.select}
           />
           {errors.rating ? (
-            <span>Rating must be from 0 to 5</span>
+            <span className={styles.spa}>Rating must be from 0 to 5</span>
           ) : (
             <span></span>
           )}
@@ -163,11 +163,11 @@ const CreateGame = () => {
           value={input.description}
           onChange={(e) => handleOnChage(e)}
           placeholder="Description"
-          rows="6" cols="50"
+          rows="5" cols="50"
           className={styles.select}
         />
         {errors.description && !input.description ? (
-          <span>Description is required </span>
+          <span className={styles.spa}>Description is required </span>
         ) : (
           <span></span>
         )}
@@ -182,7 +182,7 @@ const CreateGame = () => {
           })}
         </select>
         {errors.genres && !input.genres.length ? (
-          <span>Genre is required</span>
+          <span className={styles.spa}>Genre is required</span>
         ) : (
           <span></span>
         )}
@@ -196,7 +196,7 @@ const CreateGame = () => {
           <option value="PC">PC</option>
         </select>
         {errors.platforms && !input.platforms.length ? (
-          <span>Platform is required </span>
+          <span className={styles.spa}>Platform is required </span>
         ) : (
           <span></span>
         )}

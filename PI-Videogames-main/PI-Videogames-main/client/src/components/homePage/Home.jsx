@@ -50,7 +50,8 @@ const Home = () => {
 <Pagination
     videoGamesPage={videoGamesPage}
     games={games.length}
-    paginate={paginate} />
+    paginate={paginate} 
+    currentPage/>
   </>
   )
 }
