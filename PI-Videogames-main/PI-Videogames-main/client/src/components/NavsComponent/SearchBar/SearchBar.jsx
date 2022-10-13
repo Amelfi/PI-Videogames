@@ -1,5 +1,5 @@
 import React from 'react';
-import { getGamesByName, getGamesByGenres, filterByDb, pages } from '../../../redux/action';
+import { getGamesByName, getGamesByGenres, filterByDb, pages, filterByApi } from '../../../redux/action';
 import { useDispatch } from 'react-redux';
 import { useState } from 'react';
 
@@ -26,8 +26,12 @@ const SearchBar = ({styles}) => {
         }
         else if(option === 'Created'){
             dispatch(filterByDb(search))
+        }
+        else if(option === 'Native'){
+            dispatch(filterByApi(search))
+        }
 
-        }else{
+        else{
             dispatch(getGamesByName(search))
         }
     }
@@ -42,6 +46,7 @@ const SearchBar = ({styles}) => {
                     <option value='Name'>Name</option>
                     <option value='Genre'>Genre</option>                                                                    
                     <option value='Created'>Games Created</option>                                                                    
+                    <option value='Native'>Native Games</option>                                                                    
                 </select>
           
            

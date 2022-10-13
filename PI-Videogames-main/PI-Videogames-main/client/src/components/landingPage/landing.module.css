@@ -1,23 +1,14 @@
 .images{
    
-    height: 420px;
-   /* margin-left: 240px; */
-    
+    height: 420px;  
 }
 .contents{
     background-color: #060602;
-   
+    padding-bottom: 57px;
     display: flex;
     flex-direction: inherit;
-    /* align-items: center; */
     display: flex;
     flex-direction: column;
     align-items: center;
     
 }
-/* .row3{
-    align-items: center;
-    display: flex;
-    flex-direction: inherit;
-    height: 420;
-} */

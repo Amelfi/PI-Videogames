@@ -11,7 +11,7 @@ export const FILTER_DB ="FILTER_DB";
 export const RESET = "RESET";
 export const RESET_DETAIL = "RESET_DETAIL";
 export const PAGES = "PAGES";
-
+export const FILTER_API= 'FILTER_API';
 export const getAllGames = ()=>{
     return async (dispatch)=>{
    try {
@@ -97,6 +97,15 @@ export const getAllGames = ()=>{
     return (dispatch)=>{
         return dispatch({
             type: FILTER_DB,
+            payload
+        })
+    }
+
+ }
+ export const filterByApi =(payload)=>{
+    return (dispatch)=>{
+        return dispatch({
+            type: FILTER_API,
             payload
         })
     }

@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import "./Pagination.css";
+import styles from "./Pagination.module.css"
 
 export default function Paginate({
     videoGamesPage,
@@ -27,13 +27,13 @@ export default function Paginate({
       //       ))}
       //   </ul>
       // </nav>
-      <div className='pagination'>
+    <div className={styles.pagination}>
       {pageNumbers && pageNumbers.map((page, index) => {
           return (
               <button
                   key={index}
                   onClick={() => paginate(page)}
-                  className={page === currentPage ? "active" : ""}>
+                  className={page === currentPage ? styles.active : styles.button}>
                   {page}
               </button>
           );

@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import{useDispatch, useSelector} from 'react-redux'
 import { getAllGames, pages } from '../../redux/action';
 import Pagination from '../Pagination/Pagination';
+import Loading from '../Loading/Loading';
 
 
 
@@ -32,7 +33,7 @@ const Home = () => {
     
     <div className={styles.container}>
 
-      {currentVideoGames?.map((el, index) => {
+      {!currentVideoGames.length?<Loading/>: currentVideoGames.map((el, index) => {
         return (
           <div key={index}>
             <GameCard

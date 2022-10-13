@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllGenres, addGame } from "../../redux/action";
+import { getAllGenres, addGame, getAllGames } from "../../redux/action";
 import { useNavigate } from "react-router-dom";
 import styles from "./Create.module.css"
+import Loading from "../Loading/Loading";
 
 // regular expressions
-let url = /^(ftp|http|https):\/\/[^ "]+$/;
+let url = /(https?:\/\/.*\.(?:png|jpg))/i;
 let nameReg = /^\b[A-Za-zÑñÁáÉéÍíÓóÚúÜü\s0-9]+$/;
 
 function validator(value) {
@@ -53,11 +54,21 @@ const CreateGame = () => {
   const [errors, setErrors] = useState({});
 
   let genre = useSelector((state) => state.genre);
+  let games = useSelector((state) => state.games);
   let navigate = useNavigate();
   let dispatch = useDispatch();
 
+ let platform= games?.map(el=> el.platforms)
+ const dataArr = new Set(platform.flat(Infinity));
+ let result = [...dataArr];
+ 
+
+
+
+
   useEffect(() => {
     dispatch(getAllGenres());
+    dispatch(getAllGames());
   }, [dispatch]);
 
   // let genre= useSelector(state=>state.genre)
@@ -66,35 +77,51 @@ const CreateGame = () => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
   let handleSelectChange = (e) => {
-    setInput({ ...input, genres: [...e.target.name, e.target.value] });
+    setInput({ ...input, genres:[...new Set([...input.genres, e.target.value])]});
   };
   let handleSelectPlat = (e) => {
-    setInput({ ...input, platforms: [...e.target.name, e.target.value] });
+    setInput({ ...input, platforms:[...new Set([...input.platforms, e.target.value])] });
   };
+
+  let handleDelete=(e)=>{
+    setInput({...input,
+      genres: [...input.genres.filter(el=> el !== e.target.value)],
+      platforms: [...input.platforms.filter(el=> el !== e.target.value)],
+  })
+    }
 
   let handleOnSubmit = (e) => {
     e.preventDefault();
-
-    if (!Object.values(errors).length) {
-      console.log("2");
+       
+     
+    setErrors(validator({ ...input, [e.target.name]: e.target.value }));
+    
+    if(Object.keys(errors).length){
+      console.log("1"+Object.keys(errors).length) 
       setErrors(validator({ ...input, [e.target.name]: e.target.value }));
-    }
-    else if(!Object.values(errors).length) {
-      alert("you must fill in all the fields");
-      
-    }
-
-    else{
-      console.log("3");
-      alert('The Game has been created')
-       dispatch(addGame(input));
- 
-       navigate("/home");
-
+     
+      if(!Object.keys(errors).length){
+        console.log("2"+Object.keys(errors).length) 
+        alert('The Game has been created')
+        dispatch(addGame(input))
+        navigate("/home");
+      }
     }
     
+  else{ 
+    console.log('3'+Object.keys(errors).length) 
+      alert('The Game has been created')
+      dispatch(addGame(input))
+      navigate("/home");
+    }
+ 
+       
+           
+       
   };
   return (
+
+    !games.length? <Loading/>:(
     <div className={styles.formContent}>
       <div className={styles.formCard}> 
        <form onSubmit={handleOnSubmit}>
@@ -102,8 +129,8 @@ const CreateGame = () => {
             <h2 className={styles.h2}>Create New Game</h2>
         </div>
         
-        <div className={styles.inputs}>
-        <div className={styles.row1}>
+       
+      <div className='form'>
           <input
             type="text"
             name="name"
@@ -113,7 +140,7 @@ const CreateGame = () => {
             placeholder="Name"
             className={styles.select}
           />
-          {errors.name && !input.name ? (
+          {(input.name && !nameReg.test(input.name))&&( !input.name &&  errors.name) ? (
             <span className={styles.spa}>Name is required and must be whitout especial characters</span>
           ) : (
             <span></span>
@@ -127,7 +154,7 @@ const CreateGame = () => {
             placeholder="Image"
             className={styles.select}
           />
-          {errors.image && !input.image ? (
+          {errors.image && !input.background_image? (
             <span className={styles.spa}>Image is required and must be a valid url </span>
           ) : (
             <span></span>
@@ -141,7 +168,7 @@ const CreateGame = () => {
             placeholder="Rating"
             className={styles.select}
           />
-          {errors.rating ? (
+          {errors.rating && input.rating >5 && input.rating>0? (
             <span className={styles.spa}>Rating must be from 0 to 5</span>
           ) : (
             <span></span>
@@ -155,8 +182,8 @@ const CreateGame = () => {
             placeholder="Released"
             className={styles.select}
           />
-    </div>
-    <div className={styles.row2}>
+   
+    
         <textarea
           name="description"
           id=""
@@ -171,6 +198,12 @@ const CreateGame = () => {
         ) : (
           <span></span>
         )}
+         {input.genres?.map(el=>{
+            return(
+                <button className={styles.delete}key={el} value={el} onClick={e=> handleDelete(e)} title='Delete'>{el}</button>
+            )
+          })}
+          <hr />
         <select onChange={(e) => handleSelectChange(e)} className={styles.select}>
           <option>Select Genre</option>
           {genre?.map((el) => {
@@ -186,14 +219,20 @@ const CreateGame = () => {
         ) : (
           <span></span>
         )}
-        <select onChange={(e) => handleSelectPlat(e)} className={styles.select}>
+        
+          {input.platforms?.map(el=>{
+            return(
+                <button className={styles.delete} key={el} value={el} onClick={e=> handleDelete(e)} title='Delete'>{el}</button>
+            )
+          })}
+          <hr />
+        <select onChange={(e) => handleSelectPlat(e)}  className={styles.select}>
           <option>Select Platform</option>
-          <option value="Xbox Series S/X">Xbox Series S/X</option>
-          <option value="PlayStation 4">PlayStation 4</option>
-          <option value="PlayStation 5">PlayStation 5</option>
-          <option value="Xbox 360">Xbox 360</option>
-          <option value="Xbox One">Xbox One</option>
-          <option value="PC">PC</option>
+          {result.map((el, index)=>{
+            return(
+              <option key={index} value={el}>{el}</option>
+            );
+          })}
         </select>
         {errors.platforms && !input.platforms.length ? (
           <span className={styles.spa}>Platform is required </span>
@@ -201,13 +240,14 @@ const CreateGame = () => {
           <span></span>
         )}
         </div>
-        </div>
+        
             <div className={styles.butons}>
                 <input type="submit" value="Save" className={styles.buton}/>
             </div>
       </form>
         </div>            
     </div>
+    )
   );
 };
 

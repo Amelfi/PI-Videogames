@@ -54,6 +54,7 @@ let showAllGames = async(req, res)=>{
                 name: data.name,
                 image: data.background_image,
                 genres: data.genres?.map((el)=>el.name),   
+                platforms: data.platforms?.map((el)=>el.platform.name),   
                 rating: data.rating
                 
             }
@@ -61,7 +62,7 @@ let showAllGames = async(req, res)=>{
       
  }
 //  search data from the database
-  let dbData= await Videogame.findAll({attributes: ['id', 'name', 'image', 'rating'], 
+  let dbData= await Videogame.findAll({attributes: ['id', 'name', 'image', 'rating', 'platforms'], 
   include: {
     model: Genre
   }
@@ -72,6 +73,7 @@ let showAllGames = async(req, res)=>{
         name: el.name,
         image: el.image,
         genres: el.genres?.map(el=> el.name),
+        platforms: el.platforms?.map(el=>el),
         rating: el.rating
       }
 
@@ -110,7 +112,6 @@ let showGamesById = async(req, res)=>{
               released: el.released,
               platforms: el.platforms?.map(el=>el),
               description: el.description
-        
           }
         })
 

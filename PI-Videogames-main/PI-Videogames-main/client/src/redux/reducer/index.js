@@ -10,7 +10,8 @@ import {
   FILTER_DB,
   RESET,
   RESET_DETAIL,
-  PAGES
+  PAGES,
+  FILTER_API
  } from "../action";
 
 const initialState={
@@ -52,16 +53,13 @@ const rootReducer = (state = initialState, action)=>{
         genre: action.payload
         }
     case GET_GAMES_BY_GENRE:
-      let genres= state.backgames.filter(el=> el.genres.join(',').toLowerCase().includes(action.payload.toLowerCase()))
-     
-      if (!genres.length){
-        state.games = state.backgames
-        alert('Game not found')
-      } 
-        
+      let genres= state.backgames.filter(el=> el.genres.join(',').toLowerCase().includes(action.payload.toLowerCase()))   
+        if(!genres.length){
+          alert('Game not found')
+        }
       return{
         ...state,
-        games: genres
+        games: genres.length?genres: state.backgames
             
           }
     case ORDER_BY:
@@ -86,16 +84,33 @@ const rootReducer = (state = initialState, action)=>{
           }
 
         case FILTER_DB:
-          let data = state.backgames.filter(e=> e.id.length>10)
+          let data = state.backgames.filter(e=> isNaN(e.id))
           let searchData = data.filter(e=> e.name.toLowerCase().includes(action.payload.toLowerCase()))
-          // console.log(data)
+          console.log(data.searchData)
           if(!searchData.length){
+            alert('Game not found')
+            
+          }
+      
+          return{
+              ...state,
+              games: searchData.length? searchData: state.games,
+              page: state.page
+          }
+        case FILTER_API:
+          console.log(action.payload)
+          let dataApi = state.backgames.filter(el=> !isNaN(el.id))
+          let searchDataApi = dataApi.filter(el=> el.name.toLowerCase().includes(action.payload.toLowerCase()))
+          console.log('aqui'+searchDataApi)
+          if(!searchDataApi.length){
             alert('Game not found')
             
           }
           return{
               ...state,
-              games: searchData
+              
+              games: searchDataApi.length? searchDataApi: state.games,
+              
           }
         case RESET:
          
