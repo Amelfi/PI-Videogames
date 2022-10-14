@@ -18,7 +18,7 @@ let createGame = async(req, res) =>{
              image: background_image, 
              description, 
              released, 
-             rating, 
+             rating: parseFloat(rating),
              platforms
            }
          )
@@ -94,7 +94,7 @@ let showGamesById = async(req, res)=>{
   try {
     //Search the Game by id in the database
     if(Id.includes('-')){
-   
+      
     let info = await Videogame.findAll({attributes: ['id', 'name', 'image', 'rating', 'description', 'released', 'platforms'], 
     include: {
       model: Genre      

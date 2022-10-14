@@ -19,6 +19,7 @@
 	box-shadow: 0px 1px 10px rgba(0,0,0,0.2);
 	transition: all 400ms ease-out;
     margin-top: 25px;
+    width: 450px;
     
 }
 .select {
@@ -36,7 +37,7 @@
     margin-top: 5px;
     cursor: pointer;
     color: #96a9e9;
-   
+    width: -webkit-fill-available;
   }
   .select::placeholder {
     color: #96a9e9;
@@ -91,7 +92,7 @@
 }
 .spa{
     color:#9a0f2a;
-    font-size:10px;
+    font-size:12px;
     padding-left: 10px;
 }
 .delete{
@@ -99,6 +100,8 @@
     color: #96a9e9;
     background: #fff;
     font-size: 12px;
+    padding-left: 10px;
+    cursor: pointer;
 }
 .delete:hover{
     color:#9a0f2a;

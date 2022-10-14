@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllGenres, addGame, getAllGames } from "../../redux/action";
 import { useNavigate } from "react-router-dom";
-import styles from "./Create.module.css"
+import styles from "./Create.module.css";
 import Loading from "../Loading/Loading";
 
 // regular expressions
-let url = /(https?:\/\/.*\.(?:png|jpg))/i;
+let url = /([a-z-_0-9/:.]*.(jpg|jpeg|png|gif))/i;
 let nameReg = /^\b[A-Za-zÑñÁáÉéÍíÓóÚúÜü\s0-9]+$/;
 
 function validator(value) {
@@ -40,11 +40,35 @@ function validator(value) {
   return error;
 }
 
+function setErrorFalse(input) {
+  let error = {};
+  if (input.name && nameReg.test(input.name)) {
+    error.name = false;
+  }
+  if (input.background_image && url.test(input.background_image)) {
+    error.image = false;
+  }
+  if (input.rating <= 5 && input.rating > 0) {
+    error.rating = false;
+  }
+  if (input.description) {
+    error.description = false;
+  }
+  if (input.genres.length > 0) {
+    error.genres = false;
+  }
+  if (input.platforms.length > 0) {
+    error.platforms = false;
+  }
+  console.log("first");
+  return error;
+}
+
 const CreateGame = () => {
   const initialState = {
     name: "",
     background_image: "",
-    rating: 0,
+    rating: "",
     description: "",
     released: "",
     genres: [],
@@ -58,18 +82,19 @@ const CreateGame = () => {
   let navigate = useNavigate();
   let dispatch = useDispatch();
 
- let platform= games?.map(el=> el.platforms)
- const dataArr = new Set(platform.flat(Infinity));
- let result = [...dataArr];
- 
-
-
-
+  let platform = games?.map((el) => el.platforms);
+  const dataArr = new Set(platform.flat(Infinity));
+  let result = [...dataArr];
 
   useEffect(() => {
     dispatch(getAllGenres());
     dispatch(getAllGames());
   }, [dispatch]);
+
+  useEffect(() => {
+    setErrors({ ...errors, ...setErrorFalse(input) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [input]);
 
   // let genre= useSelector(state=>state.genre)
 
@@ -77,177 +102,199 @@ const CreateGame = () => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
   let handleSelectChange = (e) => {
-    setInput({ ...input, genres:[...new Set([...input.genres, e.target.value])]});
+    setInput({
+      ...input,
+      genres: [...new Set([...input.genres, e.target.value])],
+    });
   };
   let handleSelectPlat = (e) => {
-    setInput({ ...input, platforms:[...new Set([...input.platforms, e.target.value])] });
+    setInput({
+      ...input,
+      platforms: [...new Set([...input.platforms, e.target.value])],
+    });
   };
 
-  let handleDelete=(e)=>{
-    setInput({...input,
-      genres: [...input.genres.filter(el=> el !== e.target.value)],
-      platforms: [...input.platforms.filter(el=> el !== e.target.value)],
-  })
-    }
+  let handleDelete = (e) => {
+    setInput({
+      ...input,
+      genres: [...input.genres.filter((el) => el !== e.target.value)],
+      platforms: [...input.platforms.filter((el) => el !== e.target.value)],
+    });
+  };
 
   let handleOnSubmit = (e) => {
     e.preventDefault();
-       
-     
-    setErrors(validator({ ...input, [e.target.name]: e.target.value }));
-    
-    if(Object.keys(errors).length){
-      console.log("1"+Object.keys(errors).length) 
-      setErrors(validator({ ...input, [e.target.name]: e.target.value }));
-     
-      if(!Object.keys(errors).length){
-        console.log("2"+Object.keys(errors).length) 
-        alert('The Game has been created')
-        dispatch(addGame(input))
-        navigate("/home");
-      }
-    }
-    
-  else{ 
-    console.log('3'+Object.keys(errors).length) 
-      alert('The Game has been created')
-      dispatch(addGame(input))
-      navigate("/home");
-    }
- 
-       
-           
-       
-  };
-  return (
 
-    !games.length? <Loading/>:(
+    if (
+      errors.name === false &&
+      errors.image === false &&
+      errors.rating === false &&
+      errors.description === false &&
+      errors.platforms === false &&
+      errors.genres === false
+    ) {
+      alert("The Game has been created");
+      dispatch(addGame(input));
+      navigate("/home");
+    } else {
+      setErrors({ ...errors, ...validator(input) });
+    }
+  };
+  return !games.length ? (
+    <Loading />
+  ) : (
     <div className={styles.formContent}>
-      <div className={styles.formCard}> 
-       <form onSubmit={handleOnSubmit}>
-        <div className={styles.head}>
+      <div className={styles.formCard}>
+        <form onSubmit={handleOnSubmit}>
+          <div className={styles.head}>
             <h2 className={styles.h2}>Create New Game</h2>
-        </div>
-        
-       
-      <div className='form'>
-          <input
-            type="text"
-            name="name"
-            id=""
-            value={input.name}
-            onChange={(e) => handleOnChage(e)}
-            placeholder="Name"
-            className={styles.select}
-          />
-          {(input.name && !nameReg.test(input.name))&&( !input.name &&  errors.name) ? (
-            <span className={styles.spa}>Name is required and must be whitout especial characters</span>
-          ) : (
-            <span></span>
-          )}
-          <input
-            type="text"
-            name="background_image"
-            id=""
-            value={input.background_image}
-            onChange={(e) => handleOnChage(e)}
-            placeholder="Image"
-            className={styles.select}
-          />
-          {errors.image && !input.background_image? (
-            <span className={styles.spa}>Image is required and must be a valid url </span>
-          ) : (
-            <span></span>
-          )}
-          <input
-            type="text"
-            name="rating"
-            id=""
-            value={input.rating}
-            onChange={(e) => handleOnChage(e)}
-            placeholder="Rating"
-            className={styles.select}
-          />
-          {errors.rating && input.rating >5 && input.rating>0? (
-            <span className={styles.spa}>Rating must be from 0 to 5</span>
-          ) : (
-            <span></span>
-          )}
-          <input
-            type="date"
-            name="released"
-            id=""
-            value={input.released}
-            onChange={(e) => handleOnChage(e)}
-            placeholder="Released"
-            className={styles.select}
-          />
-   
-    
-        <textarea
-          name="description"
-          id=""
-          value={input.description}
-          onChange={(e) => handleOnChage(e)}
-          placeholder="Description"
-          rows="5" cols="50"
-          className={styles.select}
-        />
-        {errors.description && !input.description ? (
-          <span className={styles.spa}>Description is required </span>
-        ) : (
-          <span></span>
-        )}
-         {input.genres?.map(el=>{
-            return(
-                <button className={styles.delete}key={el} value={el} onClick={e=> handleDelete(e)} title='Delete'>{el}</button>
-            )
-          })}
-          <hr />
-        <select onChange={(e) => handleSelectChange(e)} className={styles.select}>
-          <option>Select Genre</option>
-          {genre?.map((el) => {
-            return (
-              <option key={el.id} value={el.name}>
-                {el.name}
-              </option>
-            );
-          })}
-        </select>
-        {errors.genres && !input.genres.length ? (
-          <span className={styles.spa}>Genre is required</span>
-        ) : (
-          <span></span>
-        )}
-        
-          {input.platforms?.map(el=>{
-            return(
-                <button className={styles.delete} key={el} value={el} onClick={e=> handleDelete(e)} title='Delete'>{el}</button>
-            )
-          })}
-          <hr />
-        <select onChange={(e) => handleSelectPlat(e)}  className={styles.select}>
-          <option>Select Platform</option>
-          {result.map((el, index)=>{
-            return(
-              <option key={index} value={el}>{el}</option>
-            );
-          })}
-        </select>
-        {errors.platforms && !input.platforms.length ? (
-          <span className={styles.spa}>Platform is required </span>
-        ) : (
-          <span></span>
-        )}
-        </div>
-        
-            <div className={styles.butons}>
-                <input type="submit" value="Save" className={styles.buton}/>
+          </div>
+
+          <div className="form">
+            <input
+              type="text"
+              name="name"
+              id=""
+              value={input.name}
+              onChange={(e) => handleOnChage(e)}
+              placeholder="Name"
+              className={styles.select}
+            />
+
+            {errors.name && (
+              <span className={styles.spa}>
+                Name is required and must be whitout especial characters
+              </span>
+            )}
+
+            <input
+              type="text"
+              name="background_image"
+              id=""
+              value={input.background_image}
+              onChange={(e) => handleOnChage(e)}
+              placeholder="Url Image"
+              className={styles.select}
+            />
+
+            {errors.image && (
+              <span className={styles.spa}>
+                Image is required and must be a valid url
+              </span>
+            )}
+
+            <input
+              type="number"
+              name="rating"
+              id=""
+              value={input.rating}
+              onChange={(e) => handleOnChage(e)}
+              placeholder="Rating"
+              className={styles.select}
+            />
+
+            {errors.rating && (
+              <span className={styles.spa}>Rating must be from 0 to 5</span>
+            )}
+
+            <input
+              type="date"
+              name="released"
+              id=""
+              value={input.released}
+              onChange={(e) => handleOnChage(e)}
+              placeholder="Released"
+              className={styles.select}
+            />
+
+            <textarea
+              name="description"
+              id=""
+              value={input.description}
+              onChange={(e) => handleOnChage(e)}
+              placeholder="Description"
+              rows="5"
+              cols="50"
+              className={styles.select}
+            />
+
+            {errors.description && (
+              <span className={styles.spa}>Description is required </span>
+            )}
+            <div className={styles.error}>
+            {input.genres?.map((el) => {
+              return (
+                <button
+                  className={styles.delete}
+                  key={el}
+                  value={el}
+                  onClick={(e) => handleDelete(e)}
+                  title="Delete"
+                >
+                  {el}
+                </button>
+              );
+            })}
             </div>
-      </form>
-        </div>            
+            <select
+              onChange={(e) => handleSelectChange(e)}
+              className={styles.select}
+            >
+              <option>Select Genre</option>
+              {genre?.map((el) => {
+                return (
+                  <option key={el.id} value={el.name}>
+                    {el.name}
+                  </option>
+                );
+              })}
+            </select>
+
+            {errors.genres && (
+              <span className={styles.spa}>Genre is required</span>
+            )}
+
+            <div className={styles.error}>
+              {input.platforms?.map((el) => {
+                return (
+                  <button
+                    className={styles.delete}
+                    key={el}
+                    value={el}
+                    onClick={(e) => handleDelete(e)}
+                    title="Delete"
+                  >
+                    {el}
+                  </button>
+                );
+              })}
+            </div>
+
+            <select
+              onChange={(e) => handleSelectPlat(e)}
+              className={styles.select}
+            >
+              <option>Select Platform</option>
+              {result.map((el, index) => {
+                return (
+                  <option key={index} value={el}>
+                    {el}
+                  </option>
+                );
+              })}
+            </select>
+
+            {errors.platforms && (
+              <span className={styles.spa}>Platform is required </span>
+            )}
+          </div>
+
+          <div className={styles.butons}>
+            <input type="submit" value="Save" className={styles.buton} />
+          </div>
+        </form>
+      </div>
     </div>
-    )
   );
 };
 
